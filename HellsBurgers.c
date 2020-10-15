@@ -2,8 +2,7 @@
 #include <stdio.h>      // libreria estandar
 #include <stdlib.h>     // para usar exit y funciones de la libreria standard
 #include <string.h>
-#include <pthread.h>    // para usar threads
-#include <semaphore.h>  // para usar semaforos
+#include <windows.h>  // para usar semaforos
 #include <unistd.h>
 
 
@@ -12,6 +11,7 @@
 //creo estructura de semaforos 
 struct semaforos {
     sem_t sem_mezclar;
+    sem_t sem_prueba;
 	//poner demas semaforos aqui
 };
 
@@ -67,6 +67,26 @@ void* cortar(void *data) {
 	usleep( 20000 );
 	//doy la señal a la siguiente accion (cortar me habilita mezclar)
     sem_post(&mydata->semaforos_param.sem_mezclar);
+	
+    pthread_exit(NULL);
+}
+
+
+void* mezclar(void *data) {
+	
+	//creo el nombre de la accion de la funcion 
+	char *accion = "cortar";
+	//creo el puntero para pasarle la referencia de memoria (data) del struct pasado por parametro (la cual es un puntero). 
+	struct parametro *mydata = data;
+
+	sem_wait(&mydata->semaforos_param.sem_mezclar);
+	//llamo a la funcion imprimir le paso el struct y la accion de la funcion
+	// imprimirAccion(mydata,accion);
+	printf("prueba exitosa");
+	//uso sleep para simular que que pasa tiempo
+	usleep( 20000 );
+	//doy la señal a la siguiente accion (cortar me habilita mezclar)
+    sem_post(&mydata->semaforos_param.sem_prueba);
 	
     pthread_exit(NULL);
 }
